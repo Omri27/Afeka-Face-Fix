@@ -26,7 +26,6 @@ private currentUser :FirebaseObjectObservable<User>;
       this.addLike();
     }else
       this.removeLike();
-
   }
   addLike(){
     this.LikeService.addLike(this.postid)
