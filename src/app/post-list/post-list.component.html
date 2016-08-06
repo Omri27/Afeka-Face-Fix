@@ -1,0 +1,58 @@
+<script>
+function centerModal() {
+    $(this).css('display', 'block');
+    var $dialog = $(this).find(".modal-dialog");
+    var offset = ($(window).height() - $dialog.height()) / 2;
+    // Center modal vertically in window
+    $dialog.css("margin-top", offset);
+}
+
+$('.modal').on('show.bs.modal', centerModal);
+$(window).on("resize", function () {
+    $('.modal:visible').each(centerModal);
+});
+</script>
+<center><h2 >Hello {{(currentUser | async)?.name}}</h2></center>
+  <friends  ></friends>
+<form (ngSubmit)="postForm.form.valid && createPost()" #postForm="ngForm">
+
+    <h1>{{newPost.title}}</h1>
+    <input type="text" placeholder="What's on your mind?" required [(ngModel)]="newPost.description" ngControl="description"
+        [ngModelOptions]="{standalone: true}">
+    <input type="checkbox" [(ngModel)]="newPost.isPublic" [ngModelOptions]="{standalone: true}">public?<br>
+    <input type="file" (change)="handleMultipleUpload($event)" multiple/><br>
+    <button type="submit">Submit</button>
+
+</form>
+
+<ul>
+    <div *ngFor="let post of posts | async">
+        <div *ngIf="post.isPublic || currentUserUid== post.userId">
+            <li>
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.description }}</p>
+                <div id= "loopphotos" *ngFor="let photo of post.photos">
+                 <a type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">  <img width="100px" [src]="photo" (click)="putImage(photo)"></a>
+                </div>
+                <div *ngIf="currentUserUid== post.userId">
+                    <input type="checkbox" (change)="changePost(post,post.$key)" [(ngModel)]="post.isPublic" [ngModelOptions]="{standalone: true}">public?<br>
+                </div>
+                <like [postid]="post.$key"></like>
+                <comment  [postid]="post.$key"></comment>
+                <div *ngIf="currentUserUid== post.userId">
+                <button (click)="deletePost(post.$key)">Delete Post</button>
+                </div>
+            </li>
+        </div>
+    </div>
+</ul>
+<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <img [src]="modalImg" class="img-responsive">
+        </div>
+    </div>
+  </div>
+</div>
+ <button  (click)="logOut()"> LogOut</button>
